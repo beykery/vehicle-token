@@ -11,8 +11,7 @@ contract Vehicle is ERC721Token {
 
   Asset[] vehicles;
 
-  event LocationChange(address _owner, string _previous, string _after);
-  event VehicleIssue(address _owner, Asset _vehicle, uint256 _tokenId);
+  event VehicleIssue(address indexed _owner, string _vehicle, uint256 _tokenId);
 
   modifier onlyOwner() {
     require(msg.sender == _owner);
@@ -26,7 +25,7 @@ contract Vehicle is ERC721Token {
   function issue(string _vin) onlyOwner public {
     Asset memory vehicle = Asset({vin: _vin});
     uint256 newVehicleId = vehicles.push(vehicle) - 1;
-    emit VehicleIssue(msg.sender, vehicle, newVehicleId);
+    emit VehicleIssue(msg.sender, vehicle.vin, newVehicleId);
     super._mint(msg.sender, newVehicleId);
   }
 }
