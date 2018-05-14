@@ -17,7 +17,7 @@ $ truffle deploy --network rinkeby
 ## Verify issue a vehicle tx in development network
 According to ethereum tx model, what we must know is the different meanings of token transfer and ethereum smart contract calling tx.
 
-First of all, we need to know how smart contract is working on ethereum. Roughly speaking, we actually send a tx to smart contract when we're calling a function in the smart contract. The primitive under `calling` is just like sending an ether to others and the only difference is sending ether tx without anything in `Input Data` field of the tx, but calling a smart contract function does have the function information in `Input Data` like `Function: transfer(address _to, uint256 _value)`. please see the below picture:
+First of all, we need to know how smart contract is working on ethereum. Roughly speaking, we actually send a tx to smart contract when we're calling a function in the smart contract. The primitive under `calling` is just like sending an ether to others and the only difference is sending ether tx without anything in `Input Data` field of the tx, but calling a smart contract function does have the function information in `Input Data` like `Function: transfer(address _to, uint256 _value)`. please see the below pictures:
 
 1. sending ether
 ![sending ether](img/send-ether-tx.png)
@@ -26,12 +26,14 @@ First of all, we need to know how smart contract is working on ethereum. Roughly
 
 So the second important question is how token transfer happened in ethereum? No magic here, we just change the smart contract's state variable `tokenOwner`, this variable is a hashmap-like data structure called `mapping` in Solidity.
 
-Imagine a scenario, Alice transfer a token to Bob. Alice may call a function `transferFrom(from, to, tokenId)`, now the ethereum will have a tx, which from Alice's address and to a smart contract's address with the funtion definition in `Input Data`. Then it's brodacasting in etheruem network and each node will *verify* this tx with runing `transferFrom(from, to, tokenId)` on their evm. When no exception thrown, the `tokenOwner` state variable's been changed like `tokenOwner[tokenId] = to`. So what is a state varaible? A state variable is an item of data held in permanent storage. That storage structure (called the State) is essentially one huge array of bytes with an address range from 0 to 2256. Each address can hold a data word of 32bytes/256bits called a slot. Each contract can use this address space to store its functional data, its 'state'.
+Imagine a scenario, Alice transfer a token to Bob. Alice may call a function `transferFrom(from, to, tokenId)`, now the ethereum will have a tx, which from Alice's address and to a smart contract's address with the funtion definition in `Input Data`. Then it's brodacasting in etheruem network and each node will *verify* this tx with runing `transferFrom(from, to, tokenId)` on their evm. When no exception thrown, the `tokenOwner` state variable's been changed like `tokenOwner[tokenId] = to`. So what is a state varaible? A state variable is an item of data held in permanent storage. That storage structure (called the State) is essentially one huge array of bytes with an address range from `0` to `2^256`. Each address can hold a data word of 32bytes/256bits called a slot. Each contract can use this address space to store its functional data.
 
 As the above mentioned, we would not see how a token has been transferred, we only can see who calls the `transferFrom` funciton as a tx in ethereum network. But fortunately, we could emit customized event in code and persist the event logs in transaction receipt for further review.
 
 So the question is narrowed to how to extract event logs by transactions' hash.
+
 ### How to extract event logs
+
 The way to extract event logs is not so easy from web3's point view.
 
 Use Vehicle contract as an example:
@@ -40,7 +42,8 @@ Use Vehicle contract as an example:
 ```
 $ truffle develop # start ganache (development network) in local
 $ truffle deploy
-saved...
+...
+Using network 'development'.
 ```
 #### 2. manipulate contract in console
 
