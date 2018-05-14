@@ -26,7 +26,7 @@ First of all, we need to know how smart contract is working on ethereum. Roughly
 
 So the second important question is how token transfer happened in ethereum? No magic here, we just change the smart contract's state variable `tokenOwner`, this variable is a hashmap-like data structure called `mapping` in Solidity.
 
-Imagine a scenario, Alice transfer a token to Bob. Alice may call a function `transferFrom(from, to, tokenId)`, now the ethereum will have a tx, which from Alice's address and to a smart contract's address with the funtion definition in `Input Data`. Then it's brodacasting in etheruem network and each node will *verify* this tx with runing `transferFrom(from, to, tokenId)` on their evm. When no exception thrown, the `tokenOwner` state variable's been changed like `tokenOwner[tokenId] = to`. A state variable is an item of data held in permanent storage. That storage structure (called the State) is essentially one huge array of bytes with an address range from 0 to 2256. Each address can hold a data word of 32bytes/256bits called a slot. Each contract can use this address space to store its functional data, its 'state'.
+Imagine a scenario, Alice transfer a token to Bob. Alice may call a function `transferFrom(from, to, tokenId)`, now the ethereum will have a tx, which from Alice's address and to a smart contract's address with the funtion definition in `Input Data`. Then it's brodacasting in etheruem network and each node will *verify* this tx with runing `transferFrom(from, to, tokenId)` on their evm. When no exception thrown, the `tokenOwner` state variable's been changed like `tokenOwner[tokenId] = to`. So what is a state varaible? A state variable is an item of data held in permanent storage. That storage structure (called the State) is essentially one huge array of bytes with an address range from 0 to 2256. Each address can hold a data word of 32bytes/256bits called a slot. Each contract can use this address space to store its functional data, its 'state'.
 
 As the above mentioned, we would not see how a token has been transferred, we only can see who calls the `transferFrom` funciton as a tx in ethereum network. But fortunately, we could emit customized event in code and persist the event logs in transaction receipt for further review.
 
@@ -127,8 +127,9 @@ v.then(v => v.issue('00000001kafa')).then(tx => JSON.stringify(tx))
 # 4. use web3 decodeLog function to recover a token transfer event
 _web3.eth.abi.decodeLog([{type: 'address', name: '_owner', indexed: true}, {type: 'string', name: '_vehicle'}, {type: 'uint256', name
 : '_tokenId'}], # event type definition
-'0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000100000000
-0000000000000000000000000000000000000000000000000000000c30303030303030316b6166610000000000000000000000000000000000000000' # data, ["0xaf3bf086eea81c0aa694cc7cb58d9dc4e5366dc2b7ceccb8eaef33736eaa26ff", # topic
+'0x00000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000c30303030303030316b6166610000000000000000000000000000000000000000', # data 
+
+["0xaf3bf086eea81c0aa694cc7cb58d9dc4e5366dc2b7ceccb8eaef33736eaa26ff", # topic
  "0x000000000000000000000000627306090abab3a6e1400e9345bc60c78a8bef57" # indexed topic
  ])
 
